@@ -4,6 +4,7 @@ from ultralytics import YOLO
 from torch.utils.data import DataLoader
 from torch.optim import SGD
 from torch.optim.lr_scheduler import StepLR
+from img_pose_show import visualize_pose
 
 # 训练主函数
 def run_prediction():
@@ -30,7 +31,18 @@ def run_prediction():
     for result in results:
         print(f"检测到 {len(result.boxes)} 个人体")
         if result.keypoints is not None:
-            print(f"关键点坐标：\n{result.keypoints.xy.cpu().numpy()}")
+            # 转换坐标为numpy数组格式
+            keypoints = result.keypoints.xy.cpu().numpy()
+            print(f"关键点坐标：\n{keypoints}")
+            
+            # 可视化第一个检测到的人体关键点
+            if len(keypoints) > 0:
+                visualize_pose(
+                    config['source'],
+                    keypoints=keypoints[0],  # 取第一个检测结果
+                    point_size=6,
+                    line_thickness=2
+                )
 
 if __name__ == "__main__":
     run_prediction()  # 重命名主函数
